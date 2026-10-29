@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SAPFPI · Gestión Académica SENA</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="is-locked">
+
+  <!-- Fondo animado compartido -->
+  <div class="bg" aria-hidden="true">
+    <span class="orb orb-1"></span>
+    <span class="orb orb-2"></span>
+    <span class="orb orb-3"></span>
+  </div>
+
+  <!-- ================= PANTALLA DE BLOQUEO (estilo iPhone) ================= -->
+  <section id="lock" class="lock" aria-label="Pantalla de bloqueo">
+    <div class="lock-top">
+      <div class="lock-status">
+        <span><i class="fa-solid fa-signal"></i> SENA</span>
+        <span><i class="fa-solid fa-wifi"></i> <i class="fa-solid fa-battery-three-quarters"></i></span>
+      </div>
+      <i class="fa-solid fa-lock lock-icon"></i>
+      <p id="lockDate" class="lock-date">—</p>
+      <h1 id="lockClock" class="lock-clock">--:--</h1>
+    </div>
+
+    <div class="lock-widgets">
+      <div class="widget glass">
+        <div class="widget-title"><i class="fa-solid fa-graduation-cap"></i> SAPFPI</div>
+        <div class="widget-grid">
+          <div><strong id="wInstructores">0</strong><small>Instructores</small></div>
+          <div><strong id="wFichas">0</strong><small>Fichas</small></div>
+          <div><strong id="wCompetencias">0</strong><small>Competencias</small></div>
+        </div>
+      </div>
+
+      <div class="notif glass">
+        <div class="notif-icon"><i class="fa-solid fa-calendar-check"></i></div>
+        <div class="notif-body">
+          <b>Asignaciones</b>
+          <span>Tienes <em id="nAsign">0</em> asignaciones registradas este trimestre.</span>
+        </div>
+        <small>ahora</small>
+      </div>
+
+      <div class="notif glass">
+        <div class="notif-icon green"><i class="fa-solid fa-shield-halved"></i></div>
+        <div class="notif-body">
+          <b>Datos protegidos</b>
+          <span>Tu informacion personal está protegida con nosotros</span>
+        </div>
+        <small>5 min</small>
+      </div>
+    </div>
+
+    <div class="lock-bottom">
+      <form id="loginForm" class="login glass" autocomplete="off" hidden>
+        <div class="field-inline">
+          <i class="fa-solid fa-user"></i>
+          <input id="loginUser" type="text" placeholder="Usuario (admin)" required>
+        </div>
+        <div class="field-inline">
+          <i class="fa-solid fa-key"></i>
+          <input id="loginPass" type="password" placeholder="Contraseña (sena2026)" required>
+        </div>
+        <button type="submit" class="btn btn-primary btn-block">Ingresar</button>
+        <p id="loginError" class="login-error" hidden>Credenciales incorrectas. Prueba admin / sena2026.</p>
+      </form>
+
+      <div id="slider" class="slider glass" role="slider" aria-label="Desliza para desbloquear" tabindex="0">
+        <div id="sliderHandle" class="slider-handle"><i class="fa-solid fa-chevron-right"></i></div>
+        <span class="slider-text">desliza para desbloquear</span>
+      </div>
+
+      <div class="lock-links">
+        <button type="button" id="toggleLogin" class="link-btn">Usar credenciales</button>
+        <span>·</span>
+        <button type="button" id="quickAccess" class="link-btn">Acceso rápido</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= APLICACIÓN PRINCIPAL ================= -->
+  <div id="app" class="app" hidden>
+
+    <header class="topbar glass">
+      <div class="brand">
+        <div class="brand-logo"><i class="fa-solid fa-graduation-cap"></i></div>
+        <div class="brand-text">
+          <strong>SAPFPI</strong>
+          <small>Gestión Académica · SENA</small>
+        </div>
+      </div>
+
+      <nav class="tabs" id="tabs" aria-label="Módulos">
+        <button class="tab active" data-module="instructores"><i class="fa-solid fa-chalkboard-user"></i><span>Instructores</span></button>
+        <button class="tab" data-module="competencias"><i class="fa-solid fa-list-check"></i><span>Competencias</span></button>
+        <button class="tab" data-module="asignaciones"><i class="fa-solid fa-link"></i><span>Asignaciones</span></button>
+        <button class="tab" data-module="fichas"><i class="fa-solid fa-folder-open"></i><span>Fichas Tituladas</span></button>
+      </nav>
+
+      <div class="user">
+        <div class="avatar">AD</div>
+        <button id="btnLock" class="icon-btn" title="Bloquear pantalla"><i class="fa-solid fa-lock"></i></button>
+      </div>
+    </header>
+
+    <main class="container">
+      <section class="stats" id="stats"></section>
+
+      <section class="panel glass">
+        <div class="panel-head">
+          <div>
+            <h2 id="panelTitle">Instructores</h2>
+            <p id="panelSub" class="muted">—</p>
+          </div>
+          <div class="panel-actions">
+            <div class="search">
+              <i class="fa-solid fa-magnifying-glass"></i>
+              <input id="search" type="search" placeholder="Buscar...">
+            </div>
+            <button id="btnNew" class="btn btn-primary"><i class="fa-solid fa-plus"></i> <span>Nuevo</span></button>
+          </div>
+        </div>
+
+        <div class="table-wrap">
+          <table class="table">
+            <thead id="thead"></thead>
+            <tbody id="tbody"></tbody>
+          </table>
+          <div id="empty" class="empty" hidden>
+            <i class="fa-regular fa-folder-open"></i>
+            <p>No hay registros para mostrar.</p>
+          </div>
+        </div>
+      </section>
+
+      <footer class="foot">
+        <span><i class="fa-solid fa-database"></i> Clave de almacenamiento: <code>sapfpiDB</code> · cifrado XOR + Base64</span>
+        <button id="btnReset" class="link-btn"><i class="fa-solid fa-rotate-left"></i> Restablecer datos de ejemplo</button>
+      </footer>
+    </main>
+  </div>
+
+  <!-- ================= MODAL CRUD ================= -->
+  <div id="modal" class="modal" hidden>
+    <div class="modal-card glass-strong" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <div class="modal-head">
+        <h3 id="modalTitle">Nuevo registro</h3>
+        <button id="modalClose" class="icon-btn" aria-label="Cerrar"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <form id="form" novalidate>
+        <div id="formFields" class="form-grid"></div>
+        <div class="modal-foot">
+          <button type="button" id="modalCancel" class="btn btn-ghost">Cancelar</button>
+          <button type="submit" class="btn btn-primary"><i class="fa-solid fa-floppy-disk"></i> Guardar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Confirmación de eliminación -->
+  <div id="confirm" class="modal" hidden>
+    <div class="modal-card small glass-strong" role="alertdialog" aria-modal="true">
+      <div class="confirm-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+      <h3>¿Eliminar registro?</h3>
+      <p id="confirmText" class="muted">Esta acción no se puede deshacer.</p>
+      <div class="modal-foot center">
+        <button id="confirmNo" class="btn btn-ghost">Cancelar</button>
+        <button id="confirmYes" class="btn btn-danger"><i class="fa-solid fa-trash"></i> Eliminar</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toasts" class="toasts" aria-live="polite"></div>
+
+  <script src="/Js/js.js"></script>
+</body>
+</html>
