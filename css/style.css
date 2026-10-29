@@ -35,7 +35,7 @@ code { background: rgba(0,0,0,.06); padding: 1px 6px; border-radius: 6px; font-s
 /* ---------- Fondo animado ---------- */
 .bg {
   position: fixed; inset: 0; z-index: -1;
-  background: url('fondo2.jpg') center / cover no-repeat;
+  background: url('img/fondo2.jpg') center / cover no-repeat;
 }
 /* Capa suave para que el texto siga siendo legible */
 .bg::after {
